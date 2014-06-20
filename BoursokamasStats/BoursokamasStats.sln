@@ -5,6 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoursokamasStats", "Boursok
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2A05C7CE-8D6C-42EB-9581-F12F7AF2AE52}"
 	ProjectSection(SolutionItems) = preProject
+		Chart.js\Chart.js = Chart.js\Chart.js
 		StatsViewer.html = StatsViewer.html
 	EndProjectSection
 EndProject

@@ -18,7 +18,7 @@ namespace BoursokamasStats
         {
             BoursoKamaReader bkr = new BoursoKamaReader();
 
-            bkr.Login("eregrith", "nDKLPSZ7");
+            bkr.Login("[username]", "[password]");
             bkr.SelectServer(BoursoKama.BoursoKamaReader.Servers.Djaul);
             while (true)
             {

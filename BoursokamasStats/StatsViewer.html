@@ -4,62 +4,252 @@
 <head>
     <meta charset="utf-8" />
     <title>Boursokama stats viewer</title>
+    <script src="Chart.js/Chart.js"></script>
+	<meta name = "viewport" content = "initial-scale = 1, user-scalable = no">
+	<style>
+		canvas{
+		}
+	</style>
 </head>
 <body>
-    
-    <div class="graph" id="statsGraph"></div>
-    <div class="contents" id="file">
-        <input type="file" id="files" name="files[]" multiple /><br />
-        <output id="list"></output><br />
-        <span>Contents:</span><div id="fileContents"></div>
+
+    <div class="graph" id="statsGraph">
+        <canvas id="canvas" height="900" width="1400"></canvas>
     </div>
 
-    <script>
-        function handleFileSelect(evt) {
-            var files = evt.target.files; // FileList object
+    <div class="contents">
+        <input type="file" id="statsFile" onchange="readStats(this.files)" type="file" /> <button onclick="refreshFile()" name="Refresh">Refresh</button>
+        <div id="fileContents"></div>
+    </div>
 
-            // files is a FileList of File objects. List some properties.
-            var output = [];
-            for (var i = 0, f; f = files[i]; i++) {
-                output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                            f.size, ' bytes, last modified: ',
-                            f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                            '</li>');
-            }
-            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-
-            refreshStatsWith(f);
-        }
-
-        document.getElementById('files').addEventListener('change', handleFileSelect, false);
-    </script>
 </body>
 </html>
 
 <script type="text/javascript">
-    
-    function refreshStatsWith(f)
-    {
-        fr = new FileReader();
-        text = fr.readAsText(f);
-        document.getElementById('fileContents').innerHTML = text;
+
+    var lineOptions = {
+
+        //Boolean - If we show the scale above the chart data			
+        scaleOverlay: true,
+
+        //Boolean - If we want to override with a hard coded scale
+        scaleOverride: false,
+
+        //** Required if scaleOverride is true **
+        //Number - The number of steps in a hard coded scale
+        scaleSteps: null,
+        //Number - The value jump in the hard coded scale
+        scaleStepWidth: null,
+        //Number - The scale starting value
+        scaleStartValue: null,
+
+        //String - Colour of the scale line	
+        scaleLineColor: "rgba(0,0,0,.1)",
+
+        //Number - Pixel width of the scale line	
+        scaleLineWidth: 1,
+
+        //Boolean - Whether to show labels on the scale	
+        scaleShowLabels: true,
+
+        //Interpolated JS string - can access value
+        scaleLabel: "<%=value%>",
+
+        //String - Scale label font declaration for the scale label
+        scaleFontFamily: "'Arial'",
+
+        //Number - Scale label font size in pixels	
+        scaleFontSize: 12,
+
+        //String - Scale label font weight style	
+        scaleFontStyle: "normal",
+
+        //String - Scale label font colour	
+        scaleFontColor: "#666",
+
+        ///Boolean - Whether grid lines are shown across the chart
+        scaleShowGridLines: true,
+
+        //String - Colour of the grid lines
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+
+        //Number - Width of the grid lines
+        scaleGridLineWidth: 1,
+
+        //Boolean - Whether the line is curved between points
+        bezierCurve: true,
+
+        //Boolean - Whether to show a dot for each point
+        pointDot: true,
+
+        //Number - Radius of each point dot in pixels
+        pointDotRadius: 3,
+
+        //Number - Pixel width of point dot stroke
+        pointDotStrokeWidth: 1,
+
+        //Boolean - Whether to show a stroke for datasets
+        datasetStroke: true,
+
+        //Number - Pixel width of dataset stroke
+        datasetStrokeWidth: 2,
+
+        //Boolean - Whether to fill the dataset with a colour
+        datasetFill: true,
+
+        //Boolean - Whether to animate the chart
+        animation: true,
+
+        //Number - Number of animation steps
+        animationSteps: 60,
+
+        //String - Animation easing effect
+        animationEasing: "easeOutQuart",
+
+        //Function - Fires when the animation is complete
+        onAnimationComplete: null
+
+    }
+
+
+    function refreshStats(fileContents) {
+        data = CSVToArray(fileContents, ";");
+        for (var i = 0, len = data.length; i < len; i++) {
+            if (data[i] != null && data[i].length >= 2) {
+                var dateAndTime = data[i][0].split(' ');
+                var dateSplit = dateAndTime[0].split('/');
+                var timeSplit = dateAndTime[1].split(':');
+                // Month is zero-indexed so subtract one from the month inside the constructor
+                var date = new Date(dateSplit[2], dateSplit[1] - 1, dateSplit[0], timeSplit[0], timeSplit[1], timeSplit[2]); //Y M D 
+                data[i][0] = date.getDay() + "/" + date.getMonth() + "/" + (date.getYear() % 100) + " " + date.getHours() + ":" + date.getMinutes();
+                data[i][1] = parseInt(data[i][1]);
+            }
+        }
+        var days = [];
+        var kamas = [];
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].length >= 2) {
+                days.push(data[i][0]);
+                kamas.push(data[i][1]);
+            }
+        }
+        //Get the context of the canvas element we want to select
+        var dataForChart = {
+            labels: days,
+            datasets: [{
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                data: kamas
+            }],
+        };
+        var ctx = document.getElementById("canvas").getContext("2d");
+        var myNewChart = new Chart(ctx).Line(dataForChart, lineOptions);
+    }
+
+    function readStats(files) {
+        file = files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            // When this event fires, the data is ready.
+            // Copy it to a <div> on the page.
+            var output = document.getElementById("fileContents");
+            output.textContent = e.target.result;
+            refreshStats(e.target.result);
+        };
+        reader.readAsText(file);
+    }
+
+    function refreshFile() {
+        readStats(document.getElementById("statsFile").files);
+    }
+
+    // ref: http://stackoverflow.com/a/1293163/2343
+    // This will parse a delimited string into an array of
+    // arrays. The default delimiter is the comma, but this
+    // can be overriden in the second argument.
+    function CSVToArray(strData, strDelimiter) {
+        // Check to see if the delimiter is defined. If not,
+        // then default to comma.
+        strDelimiter = (strDelimiter || ",");
+
+        // Create a regular expression to parse the CSV values.
+        var objPattern = new RegExp(
+            (
+                // Delimiters.
+                "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+
+                // Quoted fields.
+                "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
+                // Standard fields.
+                "([^\"\\" + strDelimiter + "\\r\\n]*))"
+            ),
+            "gi"
+            );
+
+
+        // Create an array to hold our data. Give the array
+        // a default empty first row.
+        var arrData = [[]];
+
+        // Create an array to hold our individual pattern
+        // matching groups.
+        var arrMatches = null;
+
+
+        // Keep looping over the regular expression matches
+        // until we can no longer find a match.
+        while (arrMatches = objPattern.exec(strData)) {
+
+            // Get the delimiter that was found.
+            var strMatchedDelimiter = arrMatches[1];
+
+            // Check to see if the given delimiter has a length
+            // (is not the start of string) and if it matches
+            // field delimiter. If id does not, then we know
+            // that this delimiter is a row delimiter.
+            if (
+                strMatchedDelimiter.length &&
+                strMatchedDelimiter !== strDelimiter
+                ) {
+
+                // Since we have reached a new row of data,
+                // add an empty row to our data array.
+                arrData.push([]);
+
+            }
+
+            var strMatchedValue;
+
+            // Now that we have our delimiter out of the way,
+            // let's check to see which kind of value we
+            // captured (quoted or unquoted).
+            if (arrMatches[2]) {
+
+                // We found a quoted value. When we capture
+                // this value, unescape any double quotes.
+                strMatchedValue = arrMatches[2].replace(
+                    new RegExp("\"\"", "g"),
+                    "\""
+                    );
+
+            } else {
+
+                // We found a non-quoted value.
+                strMatchedValue = arrMatches[3];
+
+            }
+
+
+            // Now that we have our value string, let's add
+            // it to the data array.
+            arrData[arrData.length - 1].push(strMatchedValue);
+        }
+
+        // Return the parsed data.
+        return (arrData);
     }
 
 </script>
-
-<style type="text/css">
-
-    .graph {
-        width: 80%;
-        height: 100%;
-        display: block;
-    }
-    .contents {
-        width: 20%;
-        height: 100%;
-        border: 1px solid black;
-        display: block;
-    }
-
-
-</style>
