@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-namespace Tests
+namespace BoursoKama
 {
     public class BoursoKamaReader
     {
@@ -28,30 +28,30 @@ namespace Tests
             Cookies = new CookieCollection();
         }
 
-        public BigInteger GetFor(String accountName, String password, Servers server)
-        {
-            BigInteger kamas = 0;
-            try
-            {
-                if (!Login(accountName, password))
-                    throw new Exception("Could not login");
+        //public BigInteger GetFor(String accountName, String password, Servers server)
+        //{
+        //    BigInteger kamas = 0;
+        //    try
+        //    {
+        //        if (!Login(accountName, password))
+        //            throw new Exception("Could not login");
 
-                if (!SelectServer(server))
-                    throw new Exception("Could not select server");
+        //        if (!SelectServer(server))
+        //            throw new Exception("Could not select server");
 
-                kamas = GetKamas();
-                if (DEBUG) Console.WriteLine("You have {0} kamas", kamas);
-            }
-            catch (Exception e)
-            {
-                DebugExceptionToConsole(e);
-            }
-            return kamas;
-        }
+        //        kamas = GetKamas();
+        //        if (DEBUG) Console.WriteLine("You have {0} kamas", kamas);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        DebugExceptionToConsole(e);
+        //    }
+        //    return kamas;
+        //}
 
-        private void Unblock()
-        {
-            AddShieldCookie();
+        //private void Unblock()
+        //{
+        //    AddShieldCookie();
             //if (DEBUG) Console.WriteLine("Trying to unblock");
 
             //String url = "https://account.ankama.com/votre-compte/securite-invalide?f=http://www.dofus.com/fr/achat-bourses-kamas-ogrines";
@@ -162,9 +162,9 @@ namespace Tests
             //    resp.Close();
             //}
 
-        }
+        //}
 
-        private BigInteger GetKamas()
+        public BigInteger GetKamas()
         {
             String url = "http://www.dofus.com/fr/achat-bourses-kamas-ogrines/0-francaise";
 
@@ -269,7 +269,7 @@ namespace Tests
             return kamas;
         }
 
-        private Boolean SelectServer(Servers server)
+        public Boolean SelectServer(Servers server)
         {
             String url = "http://www.dofus.com/fr/achat-bourses-kamas-ogrines/selection-serveur";
 
@@ -354,7 +354,7 @@ namespace Tests
             return false;
         }
 
-        private Boolean Login(string accountName, string password)
+        public Boolean Login(string accountName, string password)
         {
             String url = "https://account.ankama.com/sso";
 

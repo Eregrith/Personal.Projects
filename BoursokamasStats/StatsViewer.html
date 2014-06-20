@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Boursokama stats viewer</title>
+</head>
+<body>
+    
+    <div class="graph" id="statsGraph"></div>
+    <div class="contents" id="file">
+        <input type="file" id="files" name="files[]" multiple /><br />
+        <output id="list"></output><br />
+        <span>Contents:</span><div id="fileContents"></div>
+    </div>
+
+    <script>
+        function handleFileSelect(evt) {
+            var files = evt.target.files; // FileList object
+
+            // files is a FileList of File objects. List some properties.
+            var output = [];
+            for (var i = 0, f; f = files[i]; i++) {
+                output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                            f.size, ' bytes, last modified: ',
+                            f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                            '</li>');
+            }
+            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+
+            refreshStatsWith(f);
+        }
+
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+    </script>
+</body>
+</html>
+
+<script type="text/javascript">
+    
+    function refreshStatsWith(f)
+    {
+        fr = new FileReader();
+        text = fr.readAsText(f);
+        document.getElementById('fileContents').innerHTML = text;
+    }
+
+</script>
+
+<style type="text/css">
+
+    .graph {
+        width: 80%;
+        height: 100%;
+        display: block;
+    }
+    .contents {
+        width: 20%;
+        height: 100%;
+        border: 1px solid black;
+        display: block;
+    }
+
+
+</style>

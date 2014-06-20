@@ -1,1 +1,6 @@
 C:\projets\Personal.Projects\BoursokamasStats\BoursokamasStats\bin\Debug\BoursokamasStats.exe.config
+C:\projets\Personal.Projects\BoursokamasStats\BoursokamasStats\bin\Debug\BoursokamasStats.exe
+C:\projets\Personal.Projects\BoursokamasStats\BoursokamasStats\bin\Debug\BoursokamasStats.pdb
+C:\projets\Personal.Projects\BoursokamasStats\BoursokamasStats\obj\Debug\BoursokamasStats.csprojResolveAssemblyReference.cache
+C:\projets\Personal.Projects\BoursokamasStats\BoursokamasStats\obj\Debug\BoursokamasStats.exe
+C:\projets\Personal.Projects\BoursokamasStats\BoursokamasStats\obj\Debug\BoursokamasStats.pdb
